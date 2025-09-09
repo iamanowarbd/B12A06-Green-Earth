@@ -54,15 +54,23 @@ const displayCategory = (category) => {
 
 const clickCategory = async (id) => {
     manageSpinner(true);
-    if (id === "all") {
-        loadAllPlants();
-        return;
+    try {
+        if (id === "all") {
+            const res = await fetch("https://openapi.programming-hero.com/api/plants");
+            const data = await res.json();
+            allPlantsInfo = data.plants;
+            displayAllPlants(data.plants);
+        } else {
+            const res = await fetch(`https://openapi.programming-hero.com/api/category/${id}`);
+            const data = await res.json();
+            allPlantsInfo = data.plants;
+            displayCategoryCard(data.plants);
+        }
+    } catch (error) {
+        console.log(error);
+    } finally {
+        manageSpinner(false);
     }
-    const res = await fetch(`https://openapi.programming-hero.com/api/category/${id}`);
-    const data = await res.json();
-    displayCategoryCard(data.plants);
-    allPlantsInfo = data.plants; 
-    manageSpinner(false);
 };
 
 /**load all trees**/
@@ -158,6 +166,8 @@ const addToCart = (plantId) => {
             });
         }
         updateCartDisplay();
+
+        alert(`${plant.name} has been added to your cart!`);
     }
 };
 
